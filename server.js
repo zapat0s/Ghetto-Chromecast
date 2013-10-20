@@ -8,48 +8,45 @@ var exec = require('child_process').exec;
 
 http.createServer(function(req, res) {
 	var uri = url.parse(req.url).pathname;
-	console.log("request method: " + req.method);
+	
+	// Accept Uploads
 	if(uri == '/upload') {
-		console.log('uploading shit');
 		
 		form = new formidable.IncomingForm();
-		form.uploadDir = 'uploads';
-		console.log(form.type + '\n');
-		var uploaded_file;
-		
 
 		form.on('fileBegin', function(name, file) {
 			file.path = 'pipe';
-			child = exec('cat pipe | vlc -');
+			console.log('Now Playing: ' + file.name);
+			child = exec('cat pipe | vlc --fullscreen -'); // crashes when vlc is closed before stream ends
+
+			child.on('exit', function(code, signal) {
+				console.log('VLC exited with code: ' + code);
+			});
 		});
 
-		form.on('file', function(field, file) {
-			uploaded_file = file.name;
-			console.log(uploaded_file);
-		});
-
-		form.parse(req);
+		try {
+			form.parse(req);
+		}
+		catch(err) {
+			console.log('error: ' + err);
+		}
 
 		res.writeHead(200, {'content-type': 'text/plain'});
-		res.write('received upload:\n\n');
+		res.write('File recived.\n');
 		res.end();
 		return;
 	}
-	else if(uri =='/upload') {
-		res.writeHead(200, {'content-type': 'text/plain'});
-		res.write('Please select a file to upload');
-		res.end();
-		return;
-	}
+
+	// Server static files	
 	var filename = path.join('www', uri);
 	if(filename =='www/') {
 		filename = 'www/index.html';
 	}
 	fs.exists(filename, function(exists) {
 		if(!exists) {
-			console.log("404 error: " + uri);
+			console.log('404 error: ' + uri);
 			res.writeHead(404, {'Content-Type': 'text/plain'});
-			res.write('404 Not Found\n');
+			res.write('404 File Not Found\n');
 			res.end();
 			return;
 		}
@@ -57,5 +54,5 @@ http.createServer(function(req, res) {
 		var fileStream = fs.createReadStream(filename);
 		fileStream.pipe(res);
 	});
-}).listen(8080, '127.0.0.1');
+}).listen(8080, '');
 console.log('Server running at http://127.0.0.1:80');
