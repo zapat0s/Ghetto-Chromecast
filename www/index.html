@@ -1,20 +1,30 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Streaming Video Player Upload Page</title>
+		<title>Ghetto Chromecast</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" media="screen" href="css/bootstrap.min.css">
-	
-		<script src="js/dropzone.js"></script>
+		<link rel="stylesheet" media="screen" href="css/dropzone.css">
+		<link rel="stylesheet" media="screen" href="css/main.css">	
 	</head>
 	<body>
-		<h1></h1>
+		<h1>Gheto Chromecast</h1>
 		<div id="dropzone">
-			<form action="/upload" class="dropzone" enctype="multipart/form-data" method="POST">
-				<input type="file" name="upload_file" multiple="multiple" />
-				<input type="submit" value="Submit" />
+			<form action="/upload" id="movieUpload" class="dropzone" enctype="multipart/form-data" method="POST">
+				<div class="fallback">
+				<input type="file" name="file" multiple="multiple" />
+				</div>
 			</form>
 		</div>
+		<script src="js/dropzone.js"></script>
+		<script type="text/javascript">
+			window.Dropzone.options.movieUpload = {
+				parallelUploads: 1,
+				maxFilesize: 2048,
+				paramName: "file",
+				autoProcessQueue: true,
+			};
+		</script>
 		<script src="js/jquery-2.0.3.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 	</body>
